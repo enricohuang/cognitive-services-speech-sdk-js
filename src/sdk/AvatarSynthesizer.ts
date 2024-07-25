@@ -72,6 +72,19 @@ export class AvatarSynthesizer extends Synthesizer {
         );
     }
 
+    public async startSdp(localDescription: string): Promise<string> {
+        this.privIceServers = [];
+        console.log("### localDescription", localDescription);
+        this.privProperties.setProperty(PropertyId.TalkingAvatarService_WebRTC_SDP, localDescription);
+        const result: SpeechSynthesisResult = await this.speak("", false);
+        console.log("### result", result);
+        if (result.reason !== ResultReason.SynthesizingAudioCompleted) {
+            return "";
+        }
+        const sdpAnswerString: string = atob(result.properties.getProperty(PropertyId.TalkingAvatarService_WebRTC_SDP));
+        return sdpAnswerString;
+    }
+
     /**
      * Starts the talking avatar session and establishes the WebRTC connection.
      * @member AvatarSynthesizer.prototype.startAvatarAsync
